@@ -1,0 +1,87 @@
+# Methods
+- pointcloud.c
+    - stat1(); Reads a point cloud data stream and calculates
+        - maximum height and its grid location
+        - minimum height and its grid location
+        - average height of all points
+    - pointcloud_t* readPointCloudData(FILE *stream)
+        - reads in data from a file stream
+        - creates a pointcloud_t* to hold all of the data
+        - returns a pointcloud_t* with all of the data
+    - void imagePointCloud(pointcloud_t* pc, char* filename)
+        - takes in a pointcloud_t* and a file name
+        - determins grid demensions by the number of points
+        - creates an image and saves it to the given file name
+        - assigns a gray scale to each pixel based on its height
+        - important note, is not longer used, replaced with imagePointCloudWater
+    - void assignPointNeighbors(pointcloud_t* pc, int row, int col, pcd_t* point)
+        - given a point and a pointcloud_t*, assign neighbors for all the points
+    - int initializeWatershed(pointcloud_t* pc)
+        - initilizes array and sets depth for water to 0
+        - calls assignPointNeighbors to assign all neighbors
+    - void watershedAddUniformWater(pointcloud_t* pc, double amount)
+        - adds a uniform amount of water to the pointcloud_t*
+    - void watershedStep(pointcloud_t* pc, double wcoef, double ecoef)
+        - takes in the given coefficents as well as the pointcloud_t*
+        - does the neccesary calculations on all points to simulate the water flow
+    - double compute_f(double t1, double w1, double t2, double w2, double wcoef)
+        - prefroms a calculation with given variables
+    - void imagePointCloudWater(pointcloud_t* pc, double maxwd, char* filename)
+        - takes in a pointcloud_t* and a file name
+        - determins grid demensions by the number of points
+        - creates an image and saves it to the given file name
+        - assigns a gray scale to each pixel based on its height
+        - also asigns a blue shade to each cell based on water depth
+
+- pointcloud.h
+    - contains all function prototypes
+    - contains the pcd_t structure which is what the pointcloud data is stored in
+        - This has variables for x, y, z, and water depth
+        - Has 4 pointcloud pointers north, south, east, and west
+    - contains the pointcloud_t structure representing
+        - a list of points objects
+        - number of rows
+        - number of columns
+
+- util.c
+    - double** allocateArray(int rows, int columns)
+        - takes in # of rows and columns and returns a double** arr
+        - frees the neccesary memory for the array
+    - void freeArray(double** arr, int rows)
+        - frees the given array
+    - int listInit(List* l, int max_element_size)
+        - takes in a list pointer l and an int
+        - returns a 0 if success
+        - creates a default structure for a list with default max size of 10
+        - frees the neccesary data for structure
+    - void listAddEnd(List* l, void* elmt)
+        - takes in a list pointer and a void pointer for element
+        - adds this element to the end of the list and increments the size
+    - void* listGet(List* l, int index)
+        - takes in a list pointer and a index
+        - returns the element at that index if it exists
+
+- util.h
+    - contains all function prototypes
+    - contains macro for INDEX_2D
+    - also contains the struct for List
+        - This struct has variables for max_size, max_element_size, data, and size
+    
+- watershed.c
+    - contains the main function 
+        - which takes in these arguments
+            - the input file
+            - the number of iterations to run
+            - the starting amount of water
+            - the water flow coefficent (must be between 0.0-0.2)
+            - the water evaporation coefficent (must be between 0.9-1.0)
+            - the destination to save the files
+            - the max water depth
+            - the number of iterations to run before creating an output image
+        - checks each parameter to make sure their are no errors
+        - calls runProject to start the simulation
+    - void runProject(pointcloud_t *pc, int iter, double iwater, double wcoef, double ecoef, char *ofilebase, double maxwdepth int seq)
+        - takes in all of the parameters from main
+        - runs through each iteration calling neccesary functions when needed
+        - prints out final image 
+        - frees all neccesary memory
